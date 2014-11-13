@@ -3,7 +3,7 @@ scribe
 
 A user-friendly activity tracking and reporting application
 
-== Getting Started
+# Getting Started
 
     vagrant up
 
