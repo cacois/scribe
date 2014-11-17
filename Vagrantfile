@@ -28,6 +28,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
 
   config.vm.provision "shell", inline: "docker run --name mongodb -d mongo"
+  config.vm.provision "shell", inline: "docker build -t cacois/flask /vagrant"
   config.vm.provision "shell", inline: "docker run -d --name scribe \
-      --link mongodb:mongo -v /vagrant/src:/src -p 5000:5000 verdverm/flask"
+      --link mongodb:mongo -v /vagrant/src:/src -p 5000:5000 cacois/flask"
 end
