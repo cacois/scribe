@@ -11,14 +11,14 @@ def hello():
     return render_template('index.html',
         online_users=online_users)
 
-@app.route("/activities/:user")
+@app.route("/activities/:user", methods=['GET'])
 def user_activities():
     return "Not Yet Implemented"
 
-@app.route("/activities")
+@app.route("/activities", methods=['GET', 'POST'])
 def activities():
-    return "Not Yet Implemented"
+    return render_template('activities.html')
 
-@app.route("/report")
+@app.route("/reports", methods=['GET'])
 def report():
     return "Not Yet Implemented"
