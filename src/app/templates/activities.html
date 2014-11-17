@@ -1,0 +1,48 @@
+
+{% extends "layout.html" %}
+{% block body %}
+
+<!--I want to use this to monitor the textarea as text is entered into it, and parse out
+tags, usernames, dates, and other info automatically in real time to populate the other
+fields. This should lead to a potential workflow that requires no clicking, just typing
+the activity string into the text area and hitting enter to bring up the next activity box-->
+<script>
+var oldVal = "";
+$( document ).ready(function() {
+    $("#activity").on("change keyup paste", function() {
+        var currentVal = $(this).val();
+        if(currentVal == oldVal) {
+            return; //check to prevent multiple simultaneous triggers
+        }
+
+        oldVal = currentVal;
+        //action to be performed on textarea changed
+        console.log(oldVal);
+    });
+});
+</script>
+
+<form class="form" role="form">
+    <div class="form-group">
+        <div class="input-group">
+            <span class="input-group-addon">Activity </span>
+            <textarea id="activity" type="text" class="form-control" placeholder="Activity Description" autofocus></textarea>
+        </div>
+        </div>
+        <div class="form-group">
+            <div class="input-group">
+                <span class="input-group-addon">Tags </span>
+                <input type="text" class="form-control" placeholder="Tags">
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="input-group">
+                <span class="input-group-addon">Date </span>
+                <input type="text" class="form-control" placeholder="Date">
+                <span class="input-group-addon">Type </span>
+                <input type="text" class="form-control" placeholder="Activity Type">
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
