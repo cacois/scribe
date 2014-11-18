@@ -4,6 +4,6 @@
     "dependencies": {
         "bootstrap": "latest",
         "jquery": "2.1.1",
-        "bootstrap-tags": "latest"
+        "tagmanager": "latest"
     }
 }

@@ -2,23 +2,58 @@
 {% extends "layout.html" %}
 {% block body %}
 
+<script src='/static/bower_components/tagmanager/tagmanager.js'></script>
+<link rel="stylesheet" type="text/css" href="/static/bower_components/tagmanager/tagmanager.css" />
+
 <!--I want to use this to monitor the textarea as text is entered into it, and parse out
 tags, usernames, dates, and other info automatically in real time to populate the other
 fields. This should lead to a potential workflow that requires no clicking, just typing
 the activity string into the text area and hitting enter to bring up the next activity box-->
 <script>
-var oldVal = "";
+var lastVal = "";
+
 $( document ).ready(function() {
+
+    var tagApi = $("#tm-tags").tagsManager();
+    var userTagApi = $("#tm-users").tagsManager();
+
     $("#activity").on("change keyup paste", function() {
         var currentVal = $(this).val();
-        if(currentVal == oldVal) {
+        if(currentVal == lastVal) {
             return; //check to prevent multiple simultaneous triggers
         }
 
-        oldVal = currentVal;
+        lastVal = currentVal;
+
+        // empty existing
+        userTagApi.tagsManager('empty');
+        tagApi.tagsManager('empty');
+
         //action to be performed on textarea changed
-        console.log(oldVal);
+        console.log(lastVal);
+
+        // find user tags in string
+        var userRE = /(@\w+)/ig
+        var users = lastVal.match(userRE);
+
+        if(users) {
+          console.log('Found users! : ' + users);
+          users.forEach(function(user) {
+              userTagApi.tagsManager('pushTag',user);
+          });
+        }
+
+        var tagsRE = /(#\w+)/ig
+        var tags = lastVal.match(tagsRE);
+
+        if(tags) {
+          console.log('Found tags! : ' + tags);
+          tags.forEach(function(tag) {
+              tagApi.tagsManager('pushTag',tag);
+          });
+        }
     });
+
 });
 </script>
 
@@ -28,21 +63,25 @@ $( document ).ready(function() {
             <span class="input-group-addon">Activity </span>
             <textarea id="activity" type="text" class="form-control" placeholder="Activity Description" autofocus></textarea>
         </div>
+    </div>
+    <div class="form-group">
+        <div class="input-group">
+            <input type="text" name="users" placeholder=" Add Tags..." id="tm-tags" class="tm-input input-medium tm-input-info"/>
         </div>
-        <div class="form-group">
-            <div class="input-group">
-                <span class="input-group-addon">Tags </span>
-                <input type="text" class="form-control" placeholder="Tags">
-            </div>
+    </div>
+    <div class="form-group">
+        <div class="input-group">
+            <input type="text" name="tags" placeholder="Add Users..." id="tm-users" class="tm-input input-medium tm-input-info"/>
         </div>
-        <div class="form-group">
-            <div class="input-group">
-                <span class="input-group-addon">Date </span>
-                <input type="text" class="form-control" placeholder="Date">
-                <span class="input-group-addon">Type </span>
-                <input type="text" class="form-control" placeholder="Activity Type">
-            </div>
+    </div>
+    <div class="form-group">
+        <div class="input-group">
+            <span class="input-group-addon">Date </span>
+            <input type="text" class="form-control" placeholder="Date">
+            <span class="input-group-addon">Type </span>
+            <input type="text" class="form-control" placeholder="Activity Type">
         </div>
     </div>
 </form>
+
 {% endblock %}
