@@ -1,9 +1,14 @@
 from app import app
 from flask.ext.pymongo import PyMongo
 from flask import Flask, request, session, g, redirect, url_for, abort, \
-render_template, flash
+render_template, flash, jsonify
 
 mongo = PyMongo(app)
+
+@app.route('/_get_config')
+def add_numbers():
+    config = mongo.db.config.find_one({},{'_id': False})
+    return jsonify(config)
 
 @app.route("/")
 def hello():
@@ -17,7 +22,9 @@ def user_activities():
 
 @app.route("/activities", methods=['GET', 'POST'])
 def activities():
-    return render_template('activities.html')
+    config = mongo.db.config.find({},{'categories': True})
+    return render_template('activities.html',
+        appconfig=config)
 
 @app.route("/reports", methods=['GET'])
 def report():

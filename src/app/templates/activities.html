@@ -10,49 +10,71 @@ tags, usernames, dates, and other info automatically in real time to populate th
 fields. This should lead to a potential workflow that requires no clicking, just typing
 the activity string into the text area and hitting enter to bring up the next activity box-->
 <script>
+
+$SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+
 var lastVal = "";
+var config = null;
 
 $( document ).ready(function() {
 
-    var tagApi = $("#tm-tags").tagsManager();
-    var userTagApi = $("#tm-users").tagsManager();
+  $.getJSON($SCRIPT_ROOT + '/_get_config', null, function(data) {
+    config = data;
+  });
 
-    $("#activity").on("change keyup paste", function() {
-        var currentVal = $(this).val();
-        if(currentVal == lastVal) {
-            return; //check to prevent multiple simultaneous triggers
+  var tagApi = $("#tm-tags").tagsManager();
+  var userTagApi = $("#tm-users").tagsManager();
+  var catTagApi = $("#tm-categories").tagsManager();
+
+  $("#activity").on("change keyup paste", function() {
+    var currentVal = $(this).val();
+    if(currentVal == lastVal) {
+      return; //check to prevent multiple simultaneous triggers
+    }
+
+    console.log('Categories: ' + JSON.stringify(config.categories));
+
+    lastVal = currentVal;
+
+    // empty existing
+    userTagApi.tagsManager('empty');
+    tagApi.tagsManager('empty');
+    catTagApi.tagsManager('empty');
+
+    //action to be performed on textarea changed
+    console.log(lastVal);
+
+    // find user tags in string
+    var userRE = /(@\w+)/ig
+    var users = lastVal.match(userRE);
+
+    if(users) {
+      console.log('Found users! : ' + users);
+      users.forEach(function(user) {
+        userTagApi.tagsManager('pushTag',user.split('@')[1]);
+      });
+    }
+
+    var tagsRE = /(#\w+)/ig
+    var tags = lastVal.match(tagsRE);
+
+    if(tags) {
+      var tag = null;
+      console.log('Found tags! : ' + tags);
+      tags.forEach(function(tag) {
+        tag = tag.split('#')[1];
+
+        console.log('tag: ' + tag + ' = ' + $.inArray(tag, config.categories));
+
+        if($.inArray(tag, config.categories) >= 0) {
+          catTagApi.tagsManager('pushTag',tag);
         }
-
-        lastVal = currentVal;
-
-        // empty existing
-        userTagApi.tagsManager('empty');
-        tagApi.tagsManager('empty');
-
-        //action to be performed on textarea changed
-        console.log(lastVal);
-
-        // find user tags in string
-        var userRE = /(@\w+)/ig
-        var users = lastVal.match(userRE);
-
-        if(users) {
-          console.log('Found users! : ' + users);
-          users.forEach(function(user) {
-              userTagApi.tagsManager('pushTag',user);
-          });
+        else {
+          tagApi.tagsManager('pushTag',tag);
         }
-
-        var tagsRE = /(#\w+)/ig
-        var tags = lastVal.match(tagsRE);
-
-        if(tags) {
-          console.log('Found tags! : ' + tags);
-          tags.forEach(function(tag) {
-              tagApi.tagsManager('pushTag',tag);
-          });
-        }
-    });
+      });
+    }
+  });
 
 });
 </script>
@@ -67,19 +89,18 @@ $( document ).ready(function() {
     <div class="form-group">
         <div class="input-group">
             <input type="text" name="users" placeholder=" Add Tags..." id="tm-tags" class="tm-input input-medium tm-input-info"/>
+            <input type="text" name="tags" placeholder="Add Users..." id="tm-users" class="tm-input input-medium tm-input-success"/>
+            <input type="text" name="tags" placeholder="Add Categories..." id="tm-categories" class="tm-input input-medium tm-input-warning"/>
         </div>
-    </div>
-    <div class="form-group">
+
         <div class="input-group">
-            <input type="text" name="tags" placeholder="Add Users..." id="tm-users" class="tm-input input-medium tm-input-info"/>
+
         </div>
     </div>
     <div class="form-group">
         <div class="input-group">
             <span class="input-group-addon">Date </span>
             <input type="text" class="form-control" placeholder="Date">
-            <span class="input-group-addon">Type </span>
-            <input type="text" class="form-control" placeholder="Activity Type">
         </div>
     </div>
 </form>
