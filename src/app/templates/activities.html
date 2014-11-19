@@ -25,6 +25,11 @@ $( document ).ready(function() {
   var tagApi = $("#tm-tags").tagsManager();
   var userTagApi = $("#tm-users").tagsManager();
   var catTagApi = $("#tm-categories").tagsManager();
+  var dateTagApi = $("#tm-date").tagsManager({maxTags: 1});
+
+  var userRE = /(@\w+)/ig
+  var tagsRE = /(#\w+)/ig
+  var dateRE = /([\d][\d]*\/[\d][\d]*\/[\d][\d][\d\d]?)/ig
 
   $("#activity").on("change keyup paste", function() {
     var currentVal = $(this).val();
@@ -40,12 +45,12 @@ $( document ).ready(function() {
     userTagApi.tagsManager('empty');
     tagApi.tagsManager('empty');
     catTagApi.tagsManager('empty');
+    dateTagApi.tagsManager('empty');
 
     //action to be performed on textarea changed
     console.log(lastVal);
 
     // find user tags in string
-    var userRE = /(@\w+)/ig
     var users = lastVal.match(userRE);
 
     if(users) {
@@ -55,7 +60,7 @@ $( document ).ready(function() {
       });
     }
 
-    var tagsRE = /(#\w+)/ig
+    // find hash tags in string
     var tags = lastVal.match(tagsRE);
 
     if(tags) {
@@ -66,6 +71,7 @@ $( document ).ready(function() {
 
         console.log('tag: ' + tag + ' = ' + $.inArray(tag, config.categories));
 
+        // check to see if hashtag is a known category tag
         if($.inArray(tag, config.categories) >= 0) {
           catTagApi.tagsManager('pushTag',tag);
         }
@@ -74,9 +80,52 @@ $( document ).ready(function() {
         }
       });
     }
+
+    // find date in string
+    var dateStr = lastVal.match(dateRE);
+
+    if(dateStr) {
+        console.log('Found date! : ' + dateStr[0]);
+
+        // validate date string
+        var date = checkDate(dateStr[0]);
+        if (date) {
+            console.log('Date is valid!');
+            dateTagApi.tagsManager('pushTag',date);
+        }
+    }
+
   });
 
 });
+
+/* This funciton assumes the date has already passed a regex that
+  determined proper numeric/string form. This just checks whether
+  the date is a real calendar date.
+
+  Code adapted from: http://stackoverflow.com/a/10263258/359005
+
+  Returns a date object if date is valid, returns null if not
+  */
+function checkDate(dateStr) {
+    var parts = dateStr.toString().split('/');
+
+    // create date object
+    var month = parseInt(parts[0], 10);
+    var day = parseInt(parts[1], 10);
+    var year = parseInt(parts[2], 10);
+    var date = new Date(year, month - 1, day);
+    if (!date || !date.getTime()) return;
+
+    // check validity
+    if (date.getMonth() + 1 != month ||
+        date.getFullYear() != year ||
+        date.getDate() != day) {
+        return;
+    }
+    return date;
+}
+
 </script>
 
 <form class="form" role="form">
@@ -88,19 +137,10 @@ $( document ).ready(function() {
     </div>
     <div class="form-group">
         <div class="input-group">
-            <input type="text" name="users" placeholder=" Add Tags..." id="tm-tags" class="tm-input input-medium tm-input-info"/>
-            <input type="text" name="tags" placeholder="Add Users..." id="tm-users" class="tm-input input-medium tm-input-success"/>
-            <input type="text" name="tags" placeholder="Add Categories..." id="tm-categories" class="tm-input input-medium tm-input-warning"/>
-        </div>
-
-        <div class="input-group">
-
-        </div>
-    </div>
-    <div class="form-group">
-        <div class="input-group">
-            <span class="input-group-addon">Date </span>
-            <input type="text" class="form-control" placeholder="Date">
+            <input type="text" name="tm-tags" placeholder="Add a Tag..." id="tm-tags" class="tm-input input-medium tm-input-info"/>
+            <input type="text" name="tm-users" placeholder="Add a User..." id="tm-users" class="tm-input input-medium tm-input-success"/>
+            <input type="text" name="tm-categories" placeholder="Add a Category..." id="tm-categories" class="tm-input input-medium tm-input-warning"/>
+            <input type="text" name="tm-date" placeholder="Add a date..." id="tm-date" class="tm-input input-medium tm-input-error"/>
         </div>
     </div>
 </form>
