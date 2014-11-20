@@ -2,6 +2,8 @@ from app import app
 from flask.ext.pymongo import PyMongo
 from flask import Flask, request, session, g, redirect, url_for, abort, \
 render_template, flash, jsonify, json
+import arrow
+from datetime import datetime
 
 mongo = PyMongo(app)
 
@@ -43,16 +45,21 @@ def index():
 def activities():
     if request.method == 'POST':
 
+        date = parse_date(request.form['hidden-tm-date'])
         data = {
             'tags': request.form['hidden-tm-tags'].split(','),
             'categories': request.form['hidden-tm-categories'].split(','),
             'users': request.form['hidden-tm-users'].split(','),
-            'date': parse_date(request.form['hidden-tm-date']),
+            'date': date if date else datetime.now(),
             'message': request.form['activity']
         }
         # insert into db. using update in case we want to update tags/etc on an
         # existing post, or in case of client repost
-        mongo.db.activities.update({'message': data['message'], 'date': data['date']}, data, upsert=True)
+        mongo.db.activities.update({
+            'message': data['message'], 'date': data['date']},
+            data,
+            upsert=True)
+
         return json.dumps({'status':'OK'});
 
     elif request.method == 'GET':
