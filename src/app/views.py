@@ -7,8 +7,9 @@ mongo = PyMongo(app)
 
 @app.route('/_config', methods=['GET', 'POST'])
 def config():
-    if request.method == 'POST' and request.headers['Content-Type'] == 'application/json':
-        app.logger.info('Config posted: ' + json.dumps(request.json));
+    if request.method == 'POST':
+        app.logger.info('Data: ' + str(request))
+        app.logger.info('Config posted: ' + json.dumps(request.json))
         # use $set to update the active config record without removing
         # existing non-updated values
         mongo.db.config.update({'active': True}, {
