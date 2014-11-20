@@ -18,7 +18,8 @@ var config = null;
 
 $( document ).ready(function() {
 
-  $.getJSON($SCRIPT_ROOT + '/_get_config', null, function(data) {
+  $.getJSON($SCRIPT_ROOT + '/_config', null, function(data) {
+    console.log('Got config: ' + JSON.stringify(data));
     config = data;
   });
 
@@ -124,6 +125,20 @@ function checkDate(dateStr) {
         return;
     }
     return date;
+}
+
+function updateConfig() {
+  console.log('Posting...');
+  $.ajax({
+    type: "POST",
+    contentType: "application/json; charset=utf-8",
+    url: $SCRIPT_ROOT + '/_config',
+    data: JSON.stringify(config),
+    dataType: "json",
+    success: function(data){
+      console.log('Posted. response: ' + JSON.stringify(data));
+    }
+  });
 }
 
 </script>
