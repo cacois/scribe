@@ -129,12 +129,17 @@ function checkDate(dateStr) {
 
 function updateConfig() {
   console.log('Posting...');
-  $.post($SCRIPT_ROOT + '/_config',
-         JSON.stringify(config),
-         function(data) {
-           console.log('Posted. response: ' + JSON.stringify(data));
-         },
-         "json");
+  $.ajax({
+    url: $SCRIPT_ROOT + '/_config',
+    type: "POST",
+    data: JSON.stringify(config),
+    contentType: "application/json; charset=utf-8",
+    dataType: "json",
+    success: function(res){
+      console.log('Posted. response: ' + JSON.stringify(res));
+    }
+  }).fail(function( jqXhr, textStatus, errorThrown ){ console.log( 'POST error: ' + errorThrown ); });
+
 }
 
 </script>

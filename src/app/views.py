@@ -13,10 +13,15 @@ def config():
         # use $set to update the active config record without removing
         # existing non-updated values
         mongo.db.config.update({'active': True}, {
-            "$addToSet": {'categories': request.json.categories},
-            "$addToSet": {'users': request.json.users},
-            "$addToSet": {'tags': request.json.tags}
-            },upsert=True)
+            "$addToSet": {
+                'categories': {'$each': request.json['categories'] if 'categories' in request.json else []},
+                'users': {'$each': request.json['users'] if 'users' in request.json else []},
+                'tags': {'$each': request.json['tags'] if 'tags' in request.json else []}
+            }
+        }, upsert=True)
+
+        return json.dumps({'status':'OK'});
+
     elif request.method == 'GET':
         # get config form DB
         cursor = mongo.db.config.find({'active': True},{'_id': False})
