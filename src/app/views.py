@@ -42,7 +42,19 @@ def index():
 @app.route("/activities", methods=['GET', 'POST'])
 def activities():
     if request.method == 'POST':
-        app.logger.info('Received POST of activities: ' + request.json)
+
+        data = {
+            'tags': request.form['hidden-tm-tags'].split(','),
+            'categories': request.form['hidden-tm-categories'].split(','),
+            'users': request.form['hidden-tm-users'].split(','),
+            'date': parse_date(request.form['hidden-tm-date']),
+            'message': request.form['activity']
+        }
+        # insert into db. using update in case we want to update tags/etc on an
+        # existing post, or in case of client repost
+        mongo.db.activities.update({'message': data['message'], 'date': data['date']}, data, upsert=True)
+        return json.dumps({'status':'OK'});
+
     elif request.method == 'GET':
         return render_template('activities.html')
     else:
@@ -51,3 +63,16 @@ def activities():
 @app.route("/reports", methods=['GET'])
 def report():
     return "Not Yet Implemented"
+
+def parse_date(date_str):
+    '''parse_date()
+    Attempt to parse a string into a datetime object, return None if failure
+    '''
+    date = None
+    try:
+        date = dateutil.parser.parse(date_str)
+    except Exception:
+        # couldn't parse automatically, try some other stuff
+        app.logger.error("Unable to parse date %s" % date_str)
+
+    return date

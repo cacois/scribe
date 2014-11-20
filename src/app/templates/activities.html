@@ -18,8 +18,9 @@ var config = null;
 
 $( document ).ready(function() {
 
+  /** Initialization **/
+
   $.getJSON($SCRIPT_ROOT + '/_config', null, function(data) {
-    console.log('Got config: ' + JSON.stringify(data));
     config = data;
   });
 
@@ -32,13 +33,14 @@ $( document ).ready(function() {
   var tagsRE = /(#\w+)/ig
   var dateRE = /([\d][\d]*\/[\d][\d]*\/[\d][\d][\d\d]?)/ig
 
+
+  /** Event Methods **/
+
   $("#activity").on("change keyup paste", function() {
     var currentVal = $(this).val();
     if(currentVal == lastVal) {
       return; //check to prevent multiple simultaneous triggers
     }
-
-    console.log('Categories: ' + JSON.stringify(config.categories));
 
     lastVal = currentVal;
 
@@ -48,14 +50,10 @@ $( document ).ready(function() {
     catTagApi.tagsManager('empty');
     dateTagApi.tagsManager('empty');
 
-    //action to be performed on textarea changed
-    console.log(lastVal);
-
     // find user tags in string
     var users = lastVal.match(userRE);
 
     if(users) {
-      console.log('Found users! : ' + users);
       users.forEach(function(user) {
         userTagApi.tagsManager('pushTag',user.split('@')[1]);
       });
@@ -66,11 +64,8 @@ $( document ).ready(function() {
 
     if(tags) {
       var tag = null;
-      console.log('Found tags! : ' + tags);
       tags.forEach(function(tag) {
         tag = tag.split('#')[1];
-
-        console.log('tag: ' + tag + ' = ' + $.inArray(tag, config.categories));
 
         // check to see if hashtag is a known category tag
         if($.inArray(tag, config.categories) >= 0) {
@@ -91,23 +86,54 @@ $( document ).ready(function() {
         // validate date string
         var date = checkDate(dateStr[0]);
         if (date) {
-            console.log('Date is valid!');
             dateTagApi.tagsManager('pushTag',date);
         }
     }
 
   });
 
+  // Set listener for enter key press in activity text field
+  $('#activity').keydown(function (e){
+    if(e.keyCode == 13){
+      // submit form
+      $('.form').submit();
+
+      // move data from form into backgrouns display of submitted activities
+      // TODO
+
+      // clear form and reset focus
+    }
+  });
+
+  // set up async form submit
+  $('.form').submit(function(event) {
+      console.log('Saving activity...');
+
+      var $form = $(this);
+      var data = $form.serialize();
+
+      console.log('post data: ' + data);
+
+      $.post($form.attr('action'),data).done( function(data, status) {
+        console.log('Submitted form!');
+      });
+
+      event.preventDefault();
+  });
+
 });
 
-/* This funciton assumes the date has already passed a regex that
-  determined proper numeric/string form. This just checks whether
-  the date is a real calendar date.
-
-  Code adapted from: http://stackoverflow.com/a/10263258/359005
-
-  Returns a date object if date is valid, returns null if not
-  */
+/**
+ * checkDate()
+ *
+ * This funciton assumes the date has already passed a regex that
+ * determined proper numeric/string form. This just checks whether
+ * the date is a real calendar date.
+ *
+ * Code adapted from: http://stackoverflow.com/a/10263258/359005
+ *
+ * Returns a date object if date is valid, returns null if not
+ */
 function checkDate(dateStr) {
     var parts = dateStr.toString().split('/');
 
@@ -127,28 +153,35 @@ function checkDate(dateStr) {
     return date;
 }
 
+/**
+ * updateConfig()
+ *
+ * Send an ajax post to the server with the client's current config dict, which
+ * may contain new values fo rusers, tags, or categories. The server will accept
+ * this data and update the global config to add (not delete) to these lists
+ * based on any new values.
+ */
 function updateConfig() {
-  console.log('Posting...');
-  $.ajax({
-    url: $SCRIPT_ROOT + '/_config',
-    type: "POST",
-    data: JSON.stringify(config),
-    contentType: "application/json; charset=utf-8",
-    dataType: "json",
-    success: function(res){
-      console.log('Posted. response: ' + JSON.stringify(res));
-    }
-  }).fail(function( jqXhr, textStatus, errorThrown ){ console.log( 'POST error: ' + errorThrown ); });
-
+    console.log('Posting...');
+    $.ajax({
+        url: $SCRIPT_ROOT + '/_config',
+        type: "POST",
+        data: JSON.stringify(config),
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        success: function(res){
+          console.log('Posted. response: ' + JSON.stringify(res));
+        }
+    }).fail(function( jqXhr, textStatus, errorThrown ){ console.log( 'POST error: ' + errorThrown ); });
 }
 
 </script>
 
-<form class="form" role="form">
+<form class="form" role="form" action="/activities" data-async method="POST">
     <div class="form-group">
         <div class="input-group">
             <span class="input-group-addon">Activity </span>
-            <textarea id="activity" type="text" class="form-control" placeholder="Activity Description" autofocus></textarea>
+            <textarea id="activity" name="activity" type="text" class="form-control" placeholder="Activity Description" autofocus></textarea>
         </div>
     </div>
     <div class="form-group">
