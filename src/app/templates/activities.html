@@ -82,12 +82,6 @@ $( document ).ready(function() {
       });
     }
 
-    // find potential dates in message string
-    // NOTE: There appear to be some bugs in moment.js that
-    // make two-digit dates come up as 00 (e.g., 0013 instead
-    // of 2013). So, for now, we are only accepting 4-digit
-    // date formats. This also avoids confusion between
-    // YY-MM-DD and MM-DD-YY.
     var dateFormats = ["MM-DD-YY","MM-DD-YYYY"]
     var dateStr = null;
     dateREs.forEach(function(re) {
@@ -96,12 +90,9 @@ $( document ).ready(function() {
     });
 
     if(dateStr) {
-        console.log('Found date! : ' + dateStr);
-
         // validate date string
         if (moment(dateStr, dateFormats).isValid()) {
             dateTagApi.tagsManager('pushTag', moment(dateStr, dateFormats).format('MMMM Do YYYY'));
-            console.log(moment(dateStr, dateFormats).format('MMMM Do YYYY'));
         }
     }
 
@@ -110,24 +101,15 @@ $( document ).ready(function() {
   // Set listener for enter key press in activity text field
   $('#activity').keydown(function (e) {
     if(e.keyCode == 13){
-      // submit form
-      $('.form').submit();
-
-      // move data from form into backgrouns display of submitted activities
-      // TODO
-
-      // clear form and reset focus
+      e.preventDefault();
+      saveActivity();
     }
   });
 
   // set up async form submit
   $('.form').submit(function(event) {
-      console.log('Saving activity...');
-
       var $form = $(this);
       var data = $form.serialize();
-
-      console.log('post data: ' + data);
 
       $.post($form.attr('action'),data).done( function(data, status) {
         console.log('Submitted form!');
@@ -139,38 +121,6 @@ $( document ).ready(function() {
 });
 
 /**
- * checkDate()
- *
- * This funciton assumes the date has already passed a regex that
- * determined proper numeric/string form. This just checks whether
- * the date is a real calendar date.
- *
- * Code adapted from: http://stackoverflow.com/a/10263258/359005
- *
- * Returns a date object if date is valid, returns null if not
- */
-/*function checkDate(dateStr) {
-    var day = moment(dateStr);
-
-    var parts = dateStr.toString().split('/');
-
-    // create date object
-    var month = parseInt(parts[0], 10);
-    var day = parseInt(parts[1], 10);
-    var year = parseInt(parts[2], 10);
-    var date = new Date(year, month - 1, day);
-    if (!date || !date.getTime()) return;
-
-    // check validity
-    if (date.getMonth() + 1 != month ||
-        date.getFullYear() != year ||
-        date.getDate() != day) {
-        return;
-    }
-    return date;
-}*/
-
-/**
  * updateConfig()
  *
  * Send an ajax post to the server with the client's current config dict, which
@@ -179,7 +129,6 @@ $( document ).ready(function() {
  * based on any new values.
  */
 function updateConfig() {
-    console.log('Posting...');
     $.ajax({
         url: $SCRIPT_ROOT + '/_config',
         type: "POST",
@@ -190,6 +139,30 @@ function updateConfig() {
           console.log('Posted. response: ' + JSON.stringify(res));
         }
     }).fail(function( jqXhr, textStatus, errorThrown ){ console.log( 'POST error: ' + errorThrown ); });
+}
+
+function saveActivity() {
+  // submit form
+  $('.form').submit();
+
+  // move data from form into background display of submitted activities
+  console.log('tags: ' + $('[name=hidden-tm-tags]').val());
+  console.log('users: ' + $('[name=hidden-tm-users]').val());
+  console.log('categories: ' + $('[name=hidden-tm-categories]').val());
+  console.log('date: ' + $('[name=hidden-tm-date]').val());
+
+  $('#savedActivties').prepend('<pre>' + $('[name=activity]').val() + '</pre>');
+
+  // clear form and reset focus
+  resetForm();
+}
+
+function resetForm() {
+  $('[name=hidden-tm-tags]').val("");
+  $('[name=hidden-tm-users]').val("");
+  $('[name=hidden-tm-categories]').val("");
+  $('[name=hidden-tm-date]').val("");
+  $('[name=activity]').val("");
 }
 
 </script>
@@ -218,5 +191,6 @@ function updateConfig() {
         </div>
     </div>
 </form>
+<div id="savedActivties"></div>
 
 {% endblock %}
