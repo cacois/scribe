@@ -3,6 +3,7 @@
 {% block body %}
 
 <script src='/static/bower_components/tagmanager/tagmanager.js'></script>
+<script src='/static/bower_components/moment/moment.js'></script>
 <link rel="stylesheet" type="text/css" href="/static/bower_components/tagmanager/tagmanager.css" />
 
 <!--I want to use this to monitor the textarea as text is entered into it, and parse out
@@ -31,13 +32,17 @@ $( document ).ready(function() {
 
   var userRE = /(@\w+)/ig
   var tagsRE = /(#\w+)/ig
-  var dateRE = /([\d][\d]*\/[\d][\d]*\/[\d][\d][\d\d]?)/ig
-
+  // regular expressions to match various date formats
+  var dateREs = [/\d{1,2}\/\d{1,2}\/(\d\d){1,2}( |$)/ig,
+                 /\d{1,2}-\d{1,2}-(\d\d){1,2}( |$)/ig,
+                 /(\d\d){1,2}-\d{1,2}-(\d){2}( |$)/ig,
+                 /(\d\d){1,2}\/\d{1,2}\/(\d){2}( |$)/ig]
 
   /** Event Methods **/
 
   $("#activity").on("change keyup paste", function() {
     var currentVal = $(this).val();
+
     if(currentVal == lastVal) {
       return; //check to prevent multiple simultaneous triggers
     }
@@ -77,23 +82,33 @@ $( document ).ready(function() {
       });
     }
 
-    // find date in string
-    var dateStr = lastVal.match(dateRE);
+    // find potential dates in message string
+    // NOTE: There appear to be some bugs in moment.js that
+    // make two-digit dates come up as 00 (e.g., 0013 instead
+    // of 2013). So, for now, we are only accepting 4-digit
+    // date formats. This also avoids confusion between
+    // YY-MM-DD and MM-DD-YY.
+    var dateFormats = ["MM-DD-YY","MM-DD-YYYY"]
+    var dateStr = null;
+    dateREs.forEach(function(re) {
+        matched = lastVal.match(re);
+        if(matched) dateStr = matched[0];
+    });
 
     if(dateStr) {
-        console.log('Found date! : ' + dateStr[0]);
+        console.log('Found date! : ' + dateStr);
 
         // validate date string
-        var date = checkDate(dateStr[0]);
-        if (date) {
-            dateTagApi.tagsManager('pushTag',date);
+        if (moment(dateStr, dateFormats).isValid()) {
+            dateTagApi.tagsManager('pushTag', moment(dateStr, dateFormats).format('MMMM Do YYYY'));
+            console.log(moment(dateStr, dateFormats).format('MMMM Do YYYY'));
         }
     }
 
   });
 
   // Set listener for enter key press in activity text field
-  $('#activity').keydown(function (e){
+  $('#activity').keydown(function (e) {
     if(e.keyCode == 13){
       // submit form
       $('.form').submit();
@@ -134,7 +149,9 @@ $( document ).ready(function() {
  *
  * Returns a date object if date is valid, returns null if not
  */
-function checkDate(dateStr) {
+/*function checkDate(dateStr) {
+    var day = moment(dateStr);
+
     var parts = dateStr.toString().split('/');
 
     // create date object
@@ -151,7 +168,7 @@ function checkDate(dateStr) {
         return;
     }
     return date;
-}
+}*/
 
 /**
  * updateConfig()
