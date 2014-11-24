@@ -7,8 +7,12 @@ from datetime import datetime
 
 mongo = PyMongo(app)
 
-@app.route('/_config', methods=['GET', 'POST'])
-def config():
+####################
+#  REST API Routes
+####################
+
+@app.route('/api/config', methods=['GET', 'POST'])
+def config_api():
     if request.method == 'POST':
         app.logger.info('Data: ' + str(request))
         app.logger.info('Config posted: ' + json.dumps(request.json))
@@ -34,6 +38,43 @@ def config():
         return jsonify(config)
     else:
         return "Unsupported request header: " + request.method
+
+@app.route("/api/activities", methods=['GET'])
+def activities_api():
+    users = []
+    tags = []
+    categories = []
+    if(request.json):
+        categories = request.json['categories'] if 'categories' in request.json else []
+        users = request.json['users'] if 'users' in request.json else []
+        tags = request.json['tags'] if 'tags' in request.json else []
+        start_date = request.json['start_date']
+        end_date = request.json['end_date']
+
+    user_filters = [[{'users': user}] for user in users]
+    tag_filters = [[{'tags': tag}] for tag in tags]
+    category_filters = [[{'categories': category}] for category in categories]
+    filters = user_filters + tag_filters + category_filters
+
+    # build a mongo query
+    if(len(filters) > 0):
+        cursor = mongo.db.activities.find({'$or': filters}, {'_id': False})
+    else:
+        cursor = mongo.db.activities.find({},{'_id': False})
+
+    json = [doc for doc in cursor]
+    return jsonify({'activities': json})
+
+@app.route("/api/activities/<ObjectId:activity_id>", methods=['GET'])
+def activities_api_id(activity_id):
+    cursor = mongo.db.activities.find_one_or_404(activity_id)
+    json = [doc for doc in cursor]
+    return jsonify(json[0])
+
+
+################
+#  View Routes
+################
 
 @app.route("/")
 def index():

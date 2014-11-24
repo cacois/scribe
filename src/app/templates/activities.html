@@ -130,7 +130,7 @@ $( document ).ready(function() {
  */
 function updateConfig() {
     $.ajax({
-        url: $SCRIPT_ROOT + '/_config',
+        url: $SCRIPT_ROOT + '/api/config',
         type: "POST",
         data: JSON.stringify(config),
         contentType: "application/json; charset=utf-8",
