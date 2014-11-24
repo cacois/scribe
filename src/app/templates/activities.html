@@ -2,41 +2,23 @@
 {% extends "layout.html" %}
 {% block body %}
 
-<script src='/static/bower_components/tagmanager/tagmanager.js'></script>
-<script src='/static/bower_components/moment/moment.js'></script>
-<link rel="stylesheet" type="text/css" href="/static/bower_components/tagmanager/tagmanager.css" />
-
-<!--I want to use this to monitor the textarea as text is entered into it, and parse out
-tags, usernames, dates, and other info automatically in real time to populate the other
-fields. This should lead to a potential workflow that requires no clicking, just typing
-the activity string into the text area and hitting enter to bring up the next activity box-->
 <script>
 
 $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
 
 var lastVal = "";
-var config = null;
 
 $( document ).ready(function() {
 
   /** Initialization **/
 
-  $.getJSON($SCRIPT_ROOT + '/_config', null, function(data) {
-    config = data;
+  // get config, store
+  $.getJSON($SCRIPT_ROOT + '/api/config', null, function(data) {
+    setConfig(data);
   });
 
-  var tagApi = $("#tm-tags").tagsManager();
-  var userTagApi = $("#tm-users").tagsManager();
-  var catTagApi = $("#tm-categories").tagsManager();
-  var dateTagApi = $("#tm-date").tagsManager({maxTags: 1});
-
-  var userRE = /(@\w+)/ig
-  var tagsRE = /(#\w+)/ig
-  // regular expressions to match various date formats
-  var dateREs = [/\d{1,2}\/\d{1,2}\/(\d\d){1,2}( |$)/ig,
-                 /\d{1,2}-\d{1,2}-(\d\d){1,2}( |$)/ig,
-                 /(\d\d){1,2}-\d{1,2}-(\d){2}( |$)/ig,
-                 /(\d\d){1,2}\/\d{1,2}\/(\d){2}( |$)/ig]
+  // configure tag system
+  registerTagFields($("#tm-tags"), $("#tm-users"), $("#tm-categories"), $("#tm-date"));
 
   /** Event Methods **/
 
@@ -50,51 +32,16 @@ $( document ).ready(function() {
     lastVal = currentVal;
 
     // empty existing
-    userTagApi.tagsManager('empty');
-    tagApi.tagsManager('empty');
-    catTagApi.tagsManager('empty');
-    dateTagApi.tagsManager('empty');
+    clearTags();
 
     // find user tags in string
-    var users = lastVal.match(userRE);
-
-    if(users) {
-      users.forEach(function(user) {
-        userTagApi.tagsManager('pushTag',user.split('@')[1]);
-      });
-    }
+    parseUsers(lastVal);
 
     // find hash tags in string
-    var tags = lastVal.match(tagsRE);
+    parseHashTags(lastVal);
 
-    if(tags) {
-      var tag = null;
-      tags.forEach(function(tag) {
-        tag = tag.split('#')[1];
-
-        // check to see if hashtag is a known category tag
-        if($.inArray(tag, config.categories) >= 0) {
-          catTagApi.tagsManager('pushTag',tag);
-        }
-        else {
-          tagApi.tagsManager('pushTag',tag);
-        }
-      });
-    }
-
-    var dateFormats = ["MM-DD-YY","MM-DD-YYYY"]
-    var dateStr = null;
-    dateREs.forEach(function(re) {
-        matched = lastVal.match(re);
-        if(matched) dateStr = matched[0];
-    });
-
-    if(dateStr) {
-        // validate date string
-        if (moment(dateStr, dateFormats).isValid()) {
-            dateTagApi.tagsManager('pushTag', moment(dateStr, dateFormats).format('MMMM Do YYYY'));
-        }
-    }
+    // find date in string
+    parseDate(lastVal);
 
   });
 
@@ -119,51 +66,6 @@ $( document ).ready(function() {
   });
 
 });
-
-/**
- * updateConfig()
- *
- * Send an ajax post to the server with the client's current config dict, which
- * may contain new values fo rusers, tags, or categories. The server will accept
- * this data and update the global config to add (not delete) to these lists
- * based on any new values.
- */
-function updateConfig() {
-    $.ajax({
-        url: $SCRIPT_ROOT + '/api/config',
-        type: "POST",
-        data: JSON.stringify(config),
-        contentType: "application/json; charset=utf-8",
-        dataType: "json",
-        success: function(res){
-          console.log('Posted. response: ' + JSON.stringify(res));
-        }
-    }).fail(function( jqXhr, textStatus, errorThrown ){ console.log( 'POST error: ' + errorThrown ); });
-}
-
-function saveActivity() {
-  // submit form
-  $('.form').submit();
-
-  // move data from form into background display of submitted activities
-  console.log('tags: ' + $('[name=hidden-tm-tags]').val());
-  console.log('users: ' + $('[name=hidden-tm-users]').val());
-  console.log('categories: ' + $('[name=hidden-tm-categories]').val());
-  console.log('date: ' + $('[name=hidden-tm-date]').val());
-
-  $('#savedActivties').prepend('<pre>' + $('[name=activity]').val() + '</pre>');
-
-  // clear form and reset focus
-  resetForm();
-}
-
-function resetForm() {
-  $('[name=hidden-tm-tags]').val("");
-  $('[name=hidden-tm-users]').val("");
-  $('[name=hidden-tm-categories]').val("");
-  $('[name=hidden-tm-date]').val("");
-  $('[name=activity]').val("");
-}
 
 </script>
 

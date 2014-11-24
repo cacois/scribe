@@ -58,7 +58,7 @@ def activities_api():
 
     # build a mongo query
     if(len(filters) > 0):
-        cursor = mongo.db.activities.find({'$or': filters}, {'_id': False})
+        cursor = mongo.db.activities.find({'$and': filters}, {'_id': False})
     else:
         cursor = mongo.db.activities.find({},{'_id': False})
 
@@ -78,9 +78,7 @@ def activities_api_id(activity_id):
 
 @app.route("/")
 def index():
-    online_users = mongo.db.users.find({'online': True})
-    return render_template('index.html',
-        online_users=online_users)
+    return render_template('index.html')
 
 @app.route("/activities", methods=['GET', 'POST'])
 def activities():
