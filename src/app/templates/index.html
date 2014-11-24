@@ -7,6 +7,93 @@
 <link rel="stylesheet" type="text/css" href="/static/bower_components/tagmanager/tagmanager.css" />
 
 <script>
+var lastVal = "";
+
+$( document ).ready(function() {
+
+  /** Initialization **/
+
+  // get config, store
+  $.getJSON($SCRIPT_ROOT + '/api/config', null, function(data) {
+    setConfig(data);
+  });
+
+  // configure tag system
+  registerTagFields($("#tm-tags"), $("#tm-users"), $("#tm-categories"), $("#tm-date"));
+
+  /** Event Methods **/
+
+  $("#activity").on("change keyup paste", function() {
+    var currentVal = $(this).val();
+
+    if(currentVal == lastVal) {
+      return; //check to prevent multiple simultaneous triggers
+    }
+
+    lastVal = currentVal;
+
+    // empty existing
+    clearTags();
+
+    // find user tags in string
+    parseUsers(lastVal);
+
+    // find hash tags in string
+    parseHashTags(lastVal);
+
+    // find date in string
+    parseDate(lastVal);
+
+
+  });
+
+  // TODO: For now, updating displayed list on enter. I'd like to make this
+  // fully dynamic, detecting a change in tags and updating then.
+  // Set listener for enter key press in activity text field
+  $('#activity').keydown(function (e) {
+    if(e.keyCode == 13){
+      e.preventDefault();
+      updateActivityList();
+    }
+  });
+
+});
+
+function updateActivityList() {
+
+    data = {
+        'tags': $('[name=hidden-tm-tags]').val().split(','),
+        'users': $('[name=hidden-tm-users]').val().split(','),
+        'categories': $('[name=hidden-tm-categories]').val().split(','),
+    }
+
+    $.ajax({
+        url: $SCRIPT_ROOT + '/api/activities',
+        type: "POST",
+        data: JSON.stringify(data),
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        success: function(res){
+            console.log('Received activity data: ' + JSON.stringify(res.activities));
+//            console.log('type: ' + typeof res.activities);
+            displayActivities(res);
+        }
+    }).fail(function( jqXhr, textStatus, errorThrown ){ console.log( 'Error searching activity data: ' + errorThrown ); });
+}
+
+function displayActivities(data) {
+    clearActivityDisplay();
+    
+    console.log('Received activity data: ' + JSON.stringify(data.activities));
+    console.log('Type: ' + typeof data.activities);
+    data.activities.forEach(function(item) {
+        $('#activities').append('<pre>' + item.message + '</pre>');
+    });
+}
+
+function clearActivityDisplay() {
+    $('#activities').empty();
+}
 
 </script>
 
@@ -35,8 +122,6 @@
     </div>
 </form>
 
-
-
 <div style="margin-top:60px;">
   <div class="row">
       <div class="col-md-8">
@@ -44,9 +129,7 @@
           <div class="panel-heading">
             <h3 class="panel-title">Activities</h3>
           </div>
-          <div class="panel-body">
-            Panel content
-          </div>
+          <div class="panel-body" id="activities"></div>
         </div>
       </div>
       <div class="col-md-4 well">
@@ -55,31 +138,4 @@
   </div>
 </div>
 
-
-<!--
-<div class="container">
-  <div class="row">
-    <div class="col-md-12 btn-group" role="group" aria-label="...">
-      <button type="button" class="btn btn-default">Today</button>
-      <button type="button" class="btn btn-default">This Week</button>
-      <button type="button" class="btn btn-default">This Month</button>
-    </div>
-  </div>
-  <div class="row">
-    <form class="form" role="search">
-      <div class="form-group">
-        <div class="input-group">
-          <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
-          <input id="search" name="search" type="text" placeholder="Enter tags to search..." autofocus></textarea>
-        </div>
-      </div>
-    </form>
-  </div>
-
-  <div class="row">
-    <div class="col-md-8"></div>
-    <div class="col-md-4 well"></div>
-  </div>
-</div>
--->
 {% endblock %}

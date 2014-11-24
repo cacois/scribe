@@ -4,8 +4,6 @@
 
 <script>
 
-$SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
-
 var lastVal = "";
 
 $( document ).ready(function() {
@@ -49,7 +47,14 @@ $( document ).ready(function() {
   $('#activity').keydown(function (e) {
     if(e.keyCode == 13){
       e.preventDefault();
+      // save to DB
       saveActivity();
+
+      // udpate display
+      $('#savedActivties').prepend('<pre>' + $('[name=activity]').val() + '</pre>');
+
+      // clear form and reset focus
+      resetForm();
     }
   });
 

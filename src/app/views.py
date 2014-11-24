@@ -39,22 +39,41 @@ def config_api():
     else:
         return "Unsupported request header: " + request.method
 
-@app.route("/api/activities", methods=['GET'])
+@app.route("/api/activities", methods=['GET', 'POST'])
 def activities_api():
+    app.logger.info('Received request for activities: ' + str(request))
     users = []
     tags = []
     categories = []
-    if(request.json):
-        categories = request.json['categories'] if 'categories' in request.json else []
-        users = request.json['users'] if 'users' in request.json else []
-        tags = request.json['tags'] if 'tags' in request.json else []
-        start_date = request.json['start_date']
-        end_date = request.json['end_date']
 
-    user_filters = [[{'users': user}] for user in users]
-    tag_filters = [[{'tags': tag}] for tag in tags]
-    category_filters = [[{'categories': category}] for category in categories]
+    data = request.json
+    app.logger.info('received data: ' + str(data))
+
+    if(data is not None):
+        app.logger.info('here')
+        categories = [s.encode('utf-8') for s in data['categories']] if 'categories' in data else []
+        users = [s.encode('utf-8') for s in data['users']] if 'users' in data else []
+        tags = [s.encode('utf-8') for s in data['tags']] if 'tags' in data else []
+        start_date = data['start_date'] if 'start_date' in data else None
+        end_date = data['end_date'] if 'end_date' in data else None
+
+    # remove empty strings from arrays
+    categories = filter(None, categories)
+    tags = filter(None, tags)
+    users = filter(None, users)
+
+    app.logger.info('tags: ' + str(tags))
+    app.logger.info('users: ' + str(users))
+    app.logger.info('categories: ' + str(categories))
+    app.logger.info('start_date: ' + str(start_date))
+    app.logger.info('end_date: ' + str(end_date))
+
+    user_filters = [{'users': user.encode('utf-8')} for user in users]
+    tag_filters = [{'tags': tag.encode('utf-8')} for tag in tags]
+    category_filters = [{'categories': category.encode('utf-8')} for category in categories]
     filters = user_filters + tag_filters + category_filters
+
+    app.logger.info('filters: ' + str(filters))
 
     # build a mongo query
     if(len(filters) > 0):
@@ -62,8 +81,8 @@ def activities_api():
     else:
         cursor = mongo.db.activities.find({},{'_id': False})
 
-    json = [doc for doc in cursor]
-    return jsonify({'activities': json})
+    json_docs = [doc for doc in cursor]
+    return jsonify({'activities': json_docs})
 
 @app.route("/api/activities/<ObjectId:activity_id>", methods=['GET'])
 def activities_api_id(activity_id):
@@ -109,6 +128,11 @@ def activities():
 @app.route("/reports", methods=['GET'])
 def report():
     return "Not Yet Implemented"
+
+
+##################
+#  Helper Methods
+##################
 
 def parse_date(date_str):
     '''parse_date()

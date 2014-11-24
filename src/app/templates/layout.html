@@ -9,6 +9,10 @@
 <script src='/static/bower_components/moment/moment.js'></script>
 <script src='/static/scripts/taghelper.js'></script>
 
+<script>
+$SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+</script>
+
 <title>Scribe</title>
 
 <div class="container">

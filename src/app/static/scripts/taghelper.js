@@ -117,11 +117,6 @@ function saveActivity() {
   console.log('users: ' + $('[name=hidden-tm-users]').val());
   console.log('categories: ' + $('[name=hidden-tm-categories]').val());
   console.log('date: ' + $('[name=hidden-tm-date]').val());
-
-  $('#savedActivties').prepend('<pre>' + $('[name=activity]').val() + '</pre>');
-
-  // clear form and reset focus
-  resetForm();
 }
 
 function resetForm() {
