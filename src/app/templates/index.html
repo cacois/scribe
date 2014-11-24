@@ -8,6 +8,7 @@
 
 <script>
 var lastVal = "";
+var lastData = {}
 
 $( document ).ready(function() {
 
@@ -43,8 +44,6 @@ $( document ).ready(function() {
 
     // find date in string
     parseDate(lastVal);
-
-
   });
 
   // TODO: For now, updating displayed list on enter. I'd like to make this
@@ -61,10 +60,16 @@ $( document ).ready(function() {
 
 function updateActivityList() {
 
-    data = {
+    var data = {
         'tags': $('[name=hidden-tm-tags]').val().split(','),
         'users': $('[name=hidden-tm-users]').val().split(','),
-        'categories': $('[name=hidden-tm-categories]').val().split(','),
+        'categories': $('[name=hidden-tm-categories]').val().split(',')
+    }
+
+    // no need to talk to the server if we haven't changed the query
+    if(JSON.stringify(data) === JSON.stringify(lastData)) {
+        console.log("Request hasn't changed...not talking to server.");
+        return;
     }
 
     $.ajax({
@@ -77,15 +82,14 @@ function updateActivityList() {
             console.log('Received activity data: ' + JSON.stringify(res.activities));
 //            console.log('type: ' + typeof res.activities);
             displayActivities(res);
+            lastData = data;
         }
     }).fail(function( jqXhr, textStatus, errorThrown ){ console.log( 'Error searching activity data: ' + errorThrown ); });
 }
 
 function displayActivities(data) {
     clearActivityDisplay();
-    
-    console.log('Received activity data: ' + JSON.stringify(data.activities));
-    console.log('Type: ' + typeof data.activities);
+
     data.activities.forEach(function(item) {
         $('#activities').append('<pre>' + item.message + '</pre>');
     });
