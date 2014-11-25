@@ -97,8 +97,7 @@ function displayActivities(data) {
 
 function displayStatistics(data) {
     $('#stats').append('<li class="list-group-item">Total Activities: ' + data.activities.length + '</li>');
-
-    // TODO: Make these tag statistics configurable through the DB
+    // show stats for tags specified in config
     config.statTags.forEach(function(tag) {
         addTagStat(data.activities, tag.text, tag.label);
     });

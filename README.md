@@ -9,6 +9,10 @@ A user-friendly activity tracking and reporting application
 
 This will initialize the vagrant box and start two docker containers comprising the application: one running mongodb, and one running the flask app.
 
+The configuration of Scribe is stored in MongoDB, in a collections called 'config'. You can insert a default configuration by running the following command in MongoDB:
+
+    db.config.insert{"statTags" : [ { "text" : "deliverable", "label" : "Deliverables" }, { "text" : "blog", "label" : "Blog Posts" }, { "text" : "publication", "label" : "Publications" } ], "categories" : [ "blog", "publication", "presentation", "deliverable" ], "active" : true }
+
 ## Contributing
 
 If you add/change bower dependencies, go ahead and add them to bower.json and then re-run:
