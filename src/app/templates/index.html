@@ -99,9 +99,9 @@ function displayStatistics(data) {
     $('#stats').append('<li class="list-group-item">Total Activities: ' + data.activities.length + '</li>');
 
     // TODO: Make these tag statistics configurable through the DB
-    addTagStat(data.activities, 'deliverable', 'Deliverables');
-    addTagStat(data.activities, 'blog', 'Blog Posts');
-    addTagStat(data.activities, 'publication', 'Publications');
+    config.statTags.forEach(function(tag) {
+        addTagStat(data.activities, tag.text, tag.label);
+    });
 }
 
 function addTagStat(posts, tagStr, title) {
