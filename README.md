@@ -11,7 +11,7 @@ This will initialize the vagrant box and start two docker containers comprising 
 
 The configuration of Scribe is stored in MongoDB, in a collections called 'config'. You can insert a default configuration by running the following command in MongoDB:
 
-    db.config.insert{"statTags" : [ { "text" : "deliverable", "label" : "Deliverables" }, { "text" : "blog", "label" : "Blog Posts" }, { "text" : "publication", "label" : "Publications" } ], "categories" : [ "blog", "publication", "presentation", "deliverable" ], "active" : true }
+    db.config.insert({"statTags" : [ { "text" : "deliverable", "label" : "Deliverables" }, { "text" : "blog", "label" : "Blog Posts" }, { "text" : "publication", "label" : "Publications" } ], "categories" : [ "blog", "publication", "presentation", "deliverable" ], "active" : true })
 
 ## Contributing
 

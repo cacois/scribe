@@ -2,13 +2,14 @@
 {% extends "layout.html" %}
 {% block body %}
 
-<script src='/static/bower_components/tagmanager/tagmanager.js'></script>
-<script src='/static/bower_components/moment/moment.js'></script>
-<link rel="stylesheet" type="text/css" href="/static/bower_components/tagmanager/tagmanager.css" />
+<script type="text/javascript" src="/static/bower_components/bootstrap-daterangepicker/daterangepicker.js"></script>
+<link rel="stylesheet" type="text/css" href="/static/bower_components/bootstrap-daterangepicker/daterangepicker-bs3.css" />
 
 <script>
 var lastVal = "";
-var lastData = {}
+var lastData = {};
+var start_date = null;
+var end_date = null;
 
 $( document ).ready(function() {
 
@@ -18,6 +19,30 @@ $( document ).ready(function() {
   $.getJSON($SCRIPT_ROOT + '/api/config', null, function(data) {
     setConfig(data);
   });
+
+  // initialize daterangepicker
+  $('#reportrange').daterangepicker(
+    {
+      ranges: {
+         'Today': [moment(), moment()],
+         'Yesterday': [moment().subtract('days', 1), moment().subtract('days', 1)],
+         'Last 7 Days': [moment().subtract('days', 6), moment()],
+         'Last 30 Days': [moment().subtract('days', 29), moment()],
+         'This Month': [moment().startOf('month'), moment().endOf('month')],
+         'Last Month': [moment().subtract('month', 1).startOf('month'), moment().subtract('month', 1).endOf('month')]
+      },
+      startDate: moment().subtract('days', 29),
+      endDate: moment()
+    },
+    function(start, end) {
+        // display date range in widget
+        $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+        start_date = start;
+        end_date = end;
+        // update activities
+        updateActivityList();
+    }
+);
 
   // configure tag system
   registerTagFields($("#tm-tags"), $("#tm-users"), $("#tm-categories"), $("#tm-date"));
@@ -63,7 +88,9 @@ function updateActivityList() {
     var data = {
         'tags': $('[name=hidden-tm-tags]').val().split(','),
         'users': $('[name=hidden-tm-users]').val().split(','),
-        'categories': $('[name=hidden-tm-categories]').val().split(',')
+        'categories': $('[name=hidden-tm-categories]').val().split(','),
+        'start_date': start_date,
+        'end_date': end_date
     }
 
     // no need to talk to the server if we haven't changed the query
@@ -125,6 +152,14 @@ function clearActivityDisplay() {
 </script>
 
 <form class="form" role="form" action="/activities" data-async method="POST">
+    <div class="form-group">
+        <div class="input-group">
+            <div id="reportrange" class="pull-right" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc">
+                <i class="glyphicon glyphicon-calendar fa fa-calendar"></i>
+                <span></span> <b class="caret"></b>
+            </div>
+        </div>
+    </div>
     <div class="form-group">
         <div class="input-group">
             <span class="input-group-addon glyphicon glyphicon-search"> </span>

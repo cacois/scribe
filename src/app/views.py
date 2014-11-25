@@ -54,8 +54,8 @@ def activities_api():
         categories = [s.encode('utf-8') for s in data['categories']] if 'categories' in data else []
         users = [s.encode('utf-8') for s in data['users']] if 'users' in data else []
         tags = [s.encode('utf-8') for s in data['tags']] if 'tags' in data else []
-        start_date = data['start_date'] if 'start_date' in data else None
-        end_date = data['end_date'] if 'end_date' in data else None
+        start_date = arrow.get(data['start_date']).datetime if 'start_date' in data else None
+        end_date = arrow.get(data['end_date']).datetime if 'end_date' in data else None
 
     # remove empty strings from arrays
     categories = filter(None, categories)
@@ -77,9 +77,9 @@ def activities_api():
 
     # build a mongo query
     if(len(filters) > 0):
-        cursor = mongo.db.activities.find({'$and': filters}, {'_id': False})
+        cursor = mongo.db.activities.find({'$and': filters, "date": {"$gte": start_date, "$lte": end_date}}, {'_id': False})
     else:
-        cursor = mongo.db.activities.find({},{'_id': False})
+        cursor = mongo.db.activities.find({"date": {"$gte": start_date, "$lte": end_date}},{'_id': False})
 
     json_docs = [doc for doc in cursor]
     return jsonify({'activities': json_docs})
@@ -108,7 +108,7 @@ def activities():
             'tags': request.form['hidden-tm-tags'].split(','),
             'categories': request.form['hidden-tm-categories'].split(','),
             'users': request.form['hidden-tm-users'].split(','),
-            'date': date if date else datetime.now(),
+            'date': arrow.get(date).datetime if date else datetime.now(),
             'message': request.form['activity']
         }
         # insert into db. using update in case we want to update tags/etc on an
