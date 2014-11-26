@@ -20,6 +20,10 @@ $( document ).ready(function() {
     setConfig(data);
   });
 
+  $.getJSON($SCRIPT_ROOT + '/api/users', null, function(data) {
+    setUsers(data);
+  });
+
   // initialize daterangepicker
   $('#reportrange').daterangepicker(
     {

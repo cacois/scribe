@@ -1,4 +1,5 @@
 var config = null;
+var users = null;
 
 //** Tag Regular Expressions **//
 var userRE = /(@\w+)/ig
@@ -85,6 +86,10 @@ function clearTags() {
 
 function setConfig(conf) {
     config = conf;
+}
+
+function setUsers(userData) {
+    users = userData.users;
 }
 
 /**

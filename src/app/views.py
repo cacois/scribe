@@ -39,6 +39,18 @@ def config_api():
     else:
         return "Unsupported request header: " + request.method
 
+@app.route('/api/users', methods=['GET'])
+def users_api():
+    if request.method == 'GET':
+        # get config form DB
+        cursor = mongo.db.users.find({},{'_id': False})
+        users = [doc['username'] for doc in cursor]
+
+        app.logger.info('Returning users: ' + json.dumps(users))
+        return jsonify(users=users)
+    else:
+        return "Unsupported request header: " + request.method
+
 @app.route("/api/activities", methods=['GET', 'POST'])
 def activities_api():
     app.logger.info('Received request for activities: ' + str(request))
