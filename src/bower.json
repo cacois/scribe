@@ -7,6 +7,7 @@
         "tagmanager": "latest",
         "moment": "latest",
         "bootstrap-daterangepicker": "latest",
-        "typeahead.js": "latest"
+        "typeahead.js": "latest",
+        "lodash": "latest"
     }
 }
