@@ -19,7 +19,7 @@ var tagFields = {
     tags: {element: null, api: null},
     categories: {element: null, api: null},
     date: {element: null, api: null}
-    };
+};
 
 function registerTagFields(tagsElem, usersElem, categoriesElem, dateElem) {
     tagFields.tags.element = tagsElem;
@@ -31,6 +31,16 @@ function registerTagFields(tagsElem, usersElem, categoriesElem, dateElem) {
     tagFields.users.api = tagFields.users.element.tagsManager();
     tagFields.categories.api = tagFields.categories.element.tagsManager();
     tagFields.date.api = tagFields.date.element.tagsManager({maxTags: 1});
+}
+
+function initTypeahead(sources) {
+
+    // set users typeahead
+    tagFields.users.element.typeahead(null, {
+        name: 'users',
+        //displayKey: 'value',
+        source: sources.users.ttAdapter()
+    });
 }
 
 function parseUsers(str) {
@@ -86,10 +96,6 @@ function clearTags() {
 
 function setConfig(conf) {
     config = conf;
-}
-
-function setUsers(userData) {
-    users = userData.users;
 }
 
 /**

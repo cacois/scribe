@@ -17,12 +17,12 @@ var tokenizers = (function() {
   };
 
   function whitespace(str) {
-    str = _.toStr(str);
+    str = _.toString(str);
     return str ? str.split(/\s+/) : [];
   }
 
   function nonword(str) {
-    str = _.toStr(str);
+    str = _.toString(str);
     return str ? str.split(/\W+/) : [];
   }
 
@@ -34,7 +34,7 @@ var tokenizers = (function() {
         var tokens = [];
 
         _.each(args, function(k) {
-          tokens = tokens.concat(tokenizer(_.toStr(o[k])));
+          tokens = tokens.concat(tokenizer(_.toString(o[k])));
         });
 
         return tokens;

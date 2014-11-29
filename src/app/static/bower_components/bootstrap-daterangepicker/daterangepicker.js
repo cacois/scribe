@@ -1,9 +1,9 @@
 /**
-* @version: 1.3.16
+* @version: 1.3.17
 * @author: Dan Grossman http://www.dangrossman.info/
-* @date: 2014-11-12
+* @date: 2014-11-25
 * @copyright: Copyright (c) 2012-2014 Dan Grossman. All rights reserved.
-* @license: Licensed under Apache License v2.0. See http://www.apache.org/licenses/LICENSE-2.0
+* @license: Licensed under the MIT license. See http://www.opensource.org/licenses/mit-license.php
 * @website: http://www.improvely.com/
 */
 
@@ -604,6 +604,8 @@
             // Bind global datepicker mousedown for hiding and
             $(document)
               .on('mousedown.daterangepicker', this._outsideClickProxy)
+              // also support mobile devices
+              .on('touchend.daterangepicker', this._outsideClickProxy)
               // also explicitly play nice with Bootstrap dropdowns, which stopPropagation when clicking them
               .on('click.daterangepicker', '[data-toggle=dropdown]', this._outsideClickProxy)
               // and also close when focus changes to outside the picker (eg. tabbing between controls)
@@ -618,6 +620,8 @@
             // if the page is clicked anywhere except within the daterangerpicker/button
             // itself then call this.hide()
             if (
+                // ie modal dialog fix
+                e.type == "focusin" ||
                 target.closest(this.element).length ||
                 target.closest(this.container).length ||
                 target.closest('.calendar-date').length

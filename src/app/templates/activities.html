@@ -9,18 +9,40 @@ var lastVal = "";
 $( document ).ready(function() {
 
   /** Initialization **/
-
+  console.log('APP URL: ' + $SCRIPT_ROOT + '/api/config');
   // get config, store
   $.getJSON($SCRIPT_ROOT + '/api/config', null, function(data) {
     setConfig(data);
   });
 
-  $.getJSON($SCRIPT_ROOT + '/api/users', null, function(data) {
-    setUsers(data);
-  });
+  // initialize the suggestion engine
+  var users = new Bloodhound({
+    datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
+    queryTokenizer: Bloodhound.tokenizers.whitespace,
+    prefetch: $SCRIPT_ROOT + '/api/users'
+    });
+
+  users.initialize();
+
+  $('#tm-users').typeahead({
+      hint: true,
+      highlight: true,
+      minLength: 1
+    },
+    {
+      name: 'users',
+      displayKey: 'value',
+      // `ttAdapter` wraps the suggestion engine in an adapter that
+      // is compatible with the typeahead jQuery plugin
+      source: users.ttAdapter()
+    }
+  );
 
   // configure tag system
   registerTagFields($("#tm-tags"), $("#tm-users"), $("#tm-categories"), $("#tm-date"));
+
+  // configure typeaheads
+  //initTypeahead({users: users});
 
   /** Event Methods **/
 

@@ -1,7 +1,7 @@
 from app import app
 from flask.ext.pymongo import PyMongo
 from flask import Flask, request, session, g, redirect, url_for, abort, \
-render_template, flash, jsonify, json
+render_template, flash, jsonify, json, make_response
 import arrow
 from datetime import datetime
 
@@ -29,7 +29,7 @@ def config_api():
         return json.dumps({'status':'OK'});
 
     elif request.method == 'GET':
-        # get config form DB
+        # get config from DB
         cursor = mongo.db.config.find({'active': True},{'_id': False})
         json_config = [doc for doc in cursor]
         config = json_config[0]
@@ -42,12 +42,30 @@ def config_api():
 @app.route('/api/users', methods=['GET'])
 def users_api():
     if request.method == 'GET':
-        # get config form DB
+        # get users from DB
         cursor = mongo.db.users.find({},{'_id': False})
         users = [doc['username'] for doc in cursor]
+        users = [{'value': s} for s in users]
+        return make_response(json.dumps(users))
+    else:
+        return "Unsupported request header: " + request.method
 
-        app.logger.info('Returning users: ' + json.dumps(users))
-        return jsonify(users=users)
+@app.route('/api/states', methods=['GET'])
+def states_api():
+    if request.method == 'GET':
+        # get users from DB
+        statesData = ['Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California',
+        'Colorado', 'Connecticut', 'Delaware', 'Florida', 'Georgia', 'Hawaii',
+        'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky', 'Louisiana',
+        'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota',
+        'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire',
+        'New Jersey', 'New Mexico', 'New York', 'North Carolina', 'North Dakota',
+        'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island',
+        'South Carolina', 'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont',
+        'Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming'
+        ];
+        statesData = [{'value': s} for s in statesData]
+        return make_response(json.dumps(statesData))
     else:
         return "Unsupported request header: " + request.method
 

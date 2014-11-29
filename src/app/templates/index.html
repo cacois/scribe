@@ -20,10 +20,6 @@ $( document ).ready(function() {
     setConfig(data);
   });
 
-  $.getJSON($SCRIPT_ROOT + '/api/users', null, function(data) {
-    setUsers(data);
-  });
-
   // initialize daterangepicker
   $('#reportrange').daterangepicker(
     {
@@ -46,7 +42,7 @@ $( document ).ready(function() {
         // update activities
         updateActivityList();
     }
-);
+  );
 
   // configure tag system
   registerTagFields($("#tm-tags"), $("#tm-users"), $("#tm-categories"), $("#tm-date"));
