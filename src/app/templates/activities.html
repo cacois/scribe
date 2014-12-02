@@ -15,34 +15,11 @@ $( document ).ready(function() {
     setConfig(data);
   });
 
-  // initialize the suggestion engine
-  var users = new Bloodhound({
-    datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
-    queryTokenizer: Bloodhound.tokenizers.whitespace,
-    prefetch: $SCRIPT_ROOT + '/api/users'
-    });
-
-  users.initialize();
-
-  $('#tm-users').typeahead({
-      hint: true,
-      highlight: true,
-      minLength: 1
-    },
-    {
-      name: 'users',
-      displayKey: 'value',
-      // `ttAdapter` wraps the suggestion engine in an adapter that
-      // is compatible with the typeahead jQuery plugin
-      source: users.ttAdapter()
-    }
-  );
-
   // configure tag system
   registerTagFields($("#tm-tags"), $("#tm-users"), $("#tm-categories"), $("#tm-date"));
 
-  // configure typeaheads
-  //initTypeahead({users: users});
+  // initialize typeahead fields
+  initTypeahead();
 
   /** Event Methods **/
 
@@ -113,7 +90,7 @@ $( document ).ready(function() {
                 <input type="text" name="tm-tags" placeholder="Add a Tag..." id="tm-tags" class="tm-input input-medium tm-input-info"/>
             </div>
             <div class="col-md-3">
-                <input type="text" name="tm-users" placeholder="Add a User..." id="tm-users" class="tm-input input-medium tm-input-success"/>
+                <input type="text" name="tm-users" placeholder="Add a User..." id="tm-users" class="typeahead tm-input input-medium tm-input-success"/>
             </div>
             <div class="col-md-3">
                 <input type="text" name="tm-categories" placeholder="Add a Category..." id="tm-categories" class="tm-input input-medium tm-input-warning"/>

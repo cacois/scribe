@@ -33,14 +33,36 @@ function registerTagFields(tagsElem, usersElem, categoriesElem, dateElem) {
     tagFields.date.api = tagFields.date.element.tagsManager({maxTags: 1});
 }
 
-function initTypeahead(sources) {
+function initTypeahead() {
 
-    // set users typeahead
-    tagFields.users.element.typeahead(null, {
+    // initialize the suggestion engine
+    var users = new Bloodhound({
+      datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
+      queryTokenizer: Bloodhound.tokenizers.whitespace,
+      prefetch: $SCRIPT_ROOT + '/api/users'
+      });
+
+    users.initialize();
+
+    $('#tm-users').typeahead({
+        hint: true,
+        highlight: true,
+        minLength: 1
+      },
+      {
         name: 'users',
-        //displayKey: 'value',
-        source: sources.users.ttAdapter()
+        displayKey: 'value',
+        // `ttAdapter` wraps the suggestion engine in an adapter that
+        // is compatible with the typeahead jQuery plugin
+        source: users.ttAdapter()
+      }
+    ).on('typeahead:selected', function (e, d) {
+
+      tagFields.users.api.tagsManager("pushTag", d.value);
+
     });
+    // this is a hack to fix a bug in twitter typeahead integration with tag manager
+    $('.typeahead').not('[id]').css("opacity", "0");
 }
 
 function parseUsers(str) {
