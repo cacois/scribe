@@ -32,8 +32,8 @@ $( document ).ready(function() {
 
     lastVal = currentVal;
 
-    // empty existing
-    clearTags();
+    // empty existing tags (saving those that were entered manually)
+    resetTags();
 
     // find user tags in string
     parseUsers(lastVal);
@@ -71,6 +71,27 @@ $( document ).ready(function() {
       });
 
       event.preventDefault();
+  });
+
+  // record tags manually entered
+  $('#tm-users').keydown(function (e) {
+    if(e.keyCode == 13) {
+      recordManualTag('users');
+    }
+  });
+
+  // record tags manually entered
+  $('#tm-categories').keydown(function (e) {
+    if(e.keyCode == 13) {
+      recordManualTag('categories');
+    }
+  });
+
+  // record tags manually entered
+  $('#tm-tags').keydown(function (e) {
+    if(e.keyCode == 13) {
+      recordManualTag('tags');
+    }
   });
 
 });

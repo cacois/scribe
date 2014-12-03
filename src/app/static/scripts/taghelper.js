@@ -12,6 +12,10 @@ var dateREs = [/\d{1,2}\/\d{1,2}\/(\d\d){1,2}( |$)/ig,
 
 var dateFormats = ["MM-DD-YY","MM-DD-YYYY"]
 
+var manualTags = {'users': [],
+                  'categories': [],
+                  'tags': []};
+
 //** Helper Methods **//
 
 var tagFields = {
@@ -109,10 +113,28 @@ function parseDate(str) {
     }
 }
 
-function clearTags() {
+function recordManualTag(type) {
+  var tags = tagFields.users.api.tagsManager('tags');
+  manualTags[type].push(tags[tags.length-1]);
+  console.log('Saved tag: ' + JSON.stringify(manualTags));
+}
+
+function resetTags() {
     tagFields.users.api.tagsManager('empty');
+    manualTags.users.forEach(function(tag){
+      tagFields.users.api.tagsManager('pushTag', tag);
+    });
+
     tagFields.tags.api.tagsManager('empty');
+    manualTags.tags.forEach(function(tag){
+      tagFields.tags.api.tagsManager('pushTag', tag);
+    });
+
     tagFields.categories.api.tagsManager('empty');
+    manualTags.categories.forEach(function(tag){
+      tagFields.categories.api.tagsManager('pushTag', tag);
+    });
+
     tagFields.date.api.tagsManager('empty');
 }
 
@@ -158,4 +180,11 @@ function resetForm() {
   $('[name=hidden-tm-categories]').val("");
   $('[name=hidden-tm-date]').val("");
   $('[name=activity]').val("");
+
+  tagFields.tags.api.tagsManager('empty');
+  tagFields.users.api.tagsManager('empty');
+  tagFields.categories.api.tagsManager('empty');
+  tagFields.date.api.tagsManager('empty');
+
+  manualTags = {'users': [], 'categories': [], 'tags': []};
 }
