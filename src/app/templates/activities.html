@@ -17,7 +17,9 @@ $( document ).ready(function() {
     // initialize typeahead fields
     // Note: putting this in config callback to ensure we have
     // category data loaded (it's nested within the config object)
-    initTypeahead();
+    if(config.typeahead) {
+      initTypeahead();
+    }
   });
 
   // configure tag system
@@ -113,7 +115,7 @@ $( document ).ready(function() {
                 <input type="text" name="tm-tags" placeholder="Add a Tag..." id="tm-tags" class="tm-input input-medium tm-input-info"/>
             </div>
             <div class="col-md-3">
-                <input type="text" name="tm-users" placeholder="Add a User..." id="tm-users" class="typeahead tm-input input-medium tm-input-success"/>
+                <input type="text" name="tm-users" placeholder="Add a User..." id="tm-users" class="tm-input input-medium tm-input-success"/>
             </div>
             <div class="col-md-3">
                 <input type="text" name="tm-categories" placeholder="Add a Category..." id="tm-categories" class="tm-input input-medium tm-input-warning"/>
