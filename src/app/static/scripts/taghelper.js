@@ -1,5 +1,6 @@
 var config = null;
 var users = null;
+var categories = null;
 
 //** Tag Regular Expressions **//
 var userRE = /(@\w+)/ig
@@ -39,14 +40,22 @@ function registerTagFields(tagsElem, usersElem, categoriesElem, dateElem) {
 
 function initTypeahead() {
 
-    // initialize the suggestion engine
+    // initialize the suggestion engines
     var users = new Bloodhound({
       datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
       queryTokenizer: Bloodhound.tokenizers.whitespace,
       prefetch: $SCRIPT_ROOT + '/api/users'
-      });
+    });
+
+    var categories = new Bloodhound({
+      datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
+      queryTokenizer: Bloodhound.tokenizers.whitespace,
+      // `states` is an array of state names defined in "The Basics"
+      local: $.map(config.categories, function(cat) { return { value: cat }; })
+    });
 
     users.initialize();
+    categories.initialize();
 
     $('#tm-users').typeahead({
         hint: true,
@@ -61,10 +70,25 @@ function initTypeahead() {
         source: users.ttAdapter()
       }
     ).on('typeahead:selected', function (e, d) {
-
       tagFields.users.api.tagsManager("pushTag", d.value);
-
     });
+
+    $('#tm-categories').typeahead({
+        hint: true,
+        highlight: true,
+        minLength: 1
+      },
+      {
+        name: 'categories',
+        displayKey: 'value',
+        // `ttAdapter` wraps the suggestion engine in an adapter that
+        // is compatible with the typeahead jQuery plugin
+        source: categories.ttAdapter()
+      }
+    ).on('typeahead:selected', function (e, d) {
+      tagFields.categories.api.tagsManager("pushTag", d.value);
+    });
+
     // these are some css hacks to fix a bug in twitter typeahead integration with tag manager
     $('.typeahead').not('[id]').css("opacity", "0");
     $('.typeahead').css("background-color", "rgb(255,255,255)"); // note: does not work in Firefox

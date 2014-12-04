@@ -13,13 +13,15 @@ $( document ).ready(function() {
   // get config, store
   $.getJSON($SCRIPT_ROOT + '/api/config', null, function(data) {
     setConfig(data);
+
+    // initialize typeahead fields
+    // Note: putting this in config callback to ensure we have
+    // category data loaded (it's nested within the config object)
+    initTypeahead();
   });
 
   // configure tag system
   registerTagFields($("#tm-tags"), $("#tm-users"), $("#tm-categories"), $("#tm-date"));
-
-  // initialize typeahead fields
-  initTypeahead();
 
   /** Event Methods **/
 
