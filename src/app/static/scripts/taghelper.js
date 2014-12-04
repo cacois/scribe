@@ -65,8 +65,9 @@ function initTypeahead() {
       tagFields.users.api.tagsManager("pushTag", d.value);
 
     });
-    // this is a hack to fix a bug in twitter typeahead integration with tag manager
+    // these are some css hacks to fix a bug in twitter typeahead integration with tag manager
     $('.typeahead').not('[id]').css("opacity", "0");
+    $('.typeahead').css("background-color", "rgb(255,255,255)"); // note: does not work in Firefox
 }
 
 function parseUsers(str) {
