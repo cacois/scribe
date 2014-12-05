@@ -25,13 +25,13 @@ $( document ).ready(function() {
     {
       ranges: {
          'Today': [moment(), moment()],
-         'Yesterday': [moment().subtract('days', 1), moment().subtract('days', 1)],
-         'Last 7 Days': [moment().subtract('days', 6), moment()],
-         'Last 30 Days': [moment().subtract('days', 29), moment()],
+         'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+         'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+         'Last 30 Days': [moment().subtract(29, 'days'), moment()],
          'This Month': [moment().startOf('month'), moment().endOf('month')],
-         'Last Month': [moment().subtract('month', 1).startOf('month'), moment().subtract('month', 1).endOf('month')]
+         'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
       },
-      startDate: moment().subtract('days', 29),
+      startDate: moment().subtract(29, 'days'),
       endDate: moment()
     },
     function(start, end) {
@@ -59,7 +59,7 @@ $( document ).ready(function() {
     lastVal = currentVal;
 
     // empty existing
-    clearTags();
+    resetTags();
 
     // find user tags in string
     parseUsers(lastVal);
@@ -151,6 +151,8 @@ function clearActivityDisplay() {
 
 </script>
 
+<div class="col-md-2"></div>
+<div class="col-md-8">
 <form class="form" role="form" action="/activities" data-async method="POST">
     <div class="form-group">
         <div class="input-group">
@@ -180,7 +182,9 @@ function clearActivityDisplay() {
         </div>
     </div>
 </form>
-
+</div>
+<div class="col-md-2"></div>
+<br>
 <div style="margin-top:60px;">
   <div class="row">
       <div class="col-md-8">
