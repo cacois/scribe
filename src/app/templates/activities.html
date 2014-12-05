@@ -101,31 +101,47 @@ $( document ).ready(function() {
 });
 
 </script>
-
-<form class="form" role="form" action="/activities" data-async method="POST">
-    <div class="form-group">
-        <div class="input-group">
-            <span class="input-group-addon">Activity </span>
-            <textarea id="activity" name="activity" type="text" class="form-control" placeholder="Activity Description" tabindex="1" autofocus></textarea>
-        </div>
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Enter An Activity</h3>
+  </div>
+  <div class="panel-body">
+    <br>
+    <div class="col-md-1"></div>
+    <div class="col-md-10">
+      <form class="form" role="form" action="/activities" data-async method="POST">
+          <div class="form-group">
+              <textarea id="activity" name="activity" type="text" class="form-control" placeholder="Activity Description" tabindex="1" autofocus></textarea>
+          </div>
+          <div class="form-group">
+              <div class="input-group">
+                  <div class="col-md-3">
+                      <input type="text" name="tm-tags" placeholder="Add a Tag..." id="tm-tags" class="tm-input input-medium tm-input-info" tabindex="2"/>
+                  </div>
+                  <div class="col-md-3">
+                      <input type="text" name="tm-users" placeholder="Add a User..." id="tm-users" class="tm-input input-medium tm-input-success" tabindex="3"/>
+                  </div>
+                  <div class="col-md-3">
+                      <input type="text" name="tm-categories" placeholder="Add a Category..." id="tm-categories" class="tm-input input-medium tm-input-warning" tabindex="4"/>
+                  </div>
+                  <div class="col-md-3">
+                      <input type="text" name="tm-date" placeholder="Add a date..." id="tm-date" class="tm-input input-medium tm-input-error" tabindex="5"/>
+                  </div>
+              </div>
+          </div>
+      </form>
     </div>
-    <div class="form-group">
-        <div class="input-group">
-            <div class="col-md-3">
-                <input type="text" name="tm-tags" placeholder="Add a Tag..." id="tm-tags" class="tm-input input-medium tm-input-info" tabindex="2"/>
-            </div>
-            <div class="col-md-3">
-                <input type="text" name="tm-users" placeholder="Add a User..." id="tm-users" class="tm-input input-medium tm-input-success" tabindex="3"/>
-            </div>
-            <div class="col-md-3">
-                <input type="text" name="tm-categories" placeholder="Add a Category..." id="tm-categories" class="tm-input input-medium tm-input-warning" tabindex="4"/>
-            </div>
-            <div class="col-md-3">
-                <input type="text" name="tm-date" placeholder="Add a date..." id="tm-date" class="tm-input input-medium tm-input-error" tabindex="5"/>
-            </div>
-        </div>
-    </div>
-</form>
-<div id="savedActivties"></div>
+    <div class="col-md-1"></div>
+  </div>
+</div>
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Activities Entered</h3>
+  </div>
+  <div class="panel-body">
+    <br>
+    <div id="savedActivties"></div>
+  </div>
+</div>
 
 {% endblock %}
