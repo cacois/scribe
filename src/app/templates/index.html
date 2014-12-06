@@ -128,7 +128,17 @@ function displayActivities(data) {
     clearActivityDisplay();
 
     data.activities.forEach(function(item) {
-        $('#activities').append('<pre>' + item.message + '</pre>');
+
+        $('#activities').append(
+          '<div class="panel panel-default">' +
+            '<div class="panel-heading">' +
+              '<h3 class="panel-title">' + item.date + '</h3>' +
+            '</div>' +
+            '<div class="panel-body">' +
+              item.message +
+            '</div>' +
+          '</div>'
+          );
     });
 }
 
