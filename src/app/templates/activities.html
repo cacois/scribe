@@ -57,13 +57,17 @@ $( document ).ready(function() {
       // save to DB
       saveActivity();
 
-      // udpate display
-      $('#savedActivties').prepend('<pre>' + $('[name=activity]').val() + '</pre>');
+      // update display
+      displayActivity($('[name=activity]').val());
 
       // clear form and reset focus
       resetForm();
     }
   });
+
+  function displayActivity(message, date) {
+    $('#savedActivties').prepend('<pre>' + message + '</pre>');
+  }
 
   // set up async form submit
   $('.form').submit(function(event) {
