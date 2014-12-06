@@ -132,7 +132,15 @@ function displayActivities(data) {
         $('#activities').append(
           '<div class="panel panel-default">' +
             '<div class="panel-heading">' +
-              '<h3 class="panel-title">' + item.date + '</h3>' +
+              '<div class="row">' +
+              '<h3 class="panel-title col-md-4">' + item.date + '</h3>' +
+              '<div class="col-md-4">' +
+              'TAGS:  ' + item.tags +
+              '</div>' +
+              '<div class="col-md-4">' +
+              'USERS:  '+ item.users +
+              '</div>' +
+              '</div>' +
             '</div>' +
             '<div class="panel-body">' +
               item.message +
@@ -174,6 +182,7 @@ function clearActivityDisplay() {
 <div class="page-header">
   <h1><span class="glyphicon glyphicon-search" aria-hidden="true"></span> SEARCH <small>recorded activities</small></h1>
 </div>
+<br><br>
 <div class="col-md-2"></div>
 <div class="col-md-8">
 <form class="form" role="form" action="/activities" data-async method="POST">
@@ -188,7 +197,7 @@ function clearActivityDisplay() {
     <div class="form-group">
         <div class="input-group">
             <span class="input-group-addon glyphicon glyphicon-search"> </span>
-            <input id="activity" name="activity" type="text" class="form-control" placeholder="Enter tags to filter activities. E.g. #tag @user" autofocus></input>
+            <input id="activity" name="activity" type="text" class="form-control glowing-border" placeholder="Enter tags to filter activities. E.g. #tag @user" autofocus></input>
         </div>
     </div>
     <div class="form-group">
@@ -206,6 +215,7 @@ function clearActivityDisplay() {
     </div>
 </form>
 </div>
+<br><br><br><br><br>
 <div class="col-md-2"></div>
 <br>
 <div style="margin-top:60px;">
