@@ -17,8 +17,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     vb.customize ["modifyvm", :id, "--memory", "1024"]
   end
 
-  #config.vm.provision "shell", inline: "sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10"
-  #config.vm.provision "shell", inline: "echo 'deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen' | sudo tee /etc/apt/sources.list.d/mongodb.list"
   config.vm.provision "shell", inline: "apt-get -y remove grub-legacy grub-common"
   config.vm.provision "shell", inline: "apt-get update"
   #config.vm.provision "shell", inline: "apt-get -y upgrade"

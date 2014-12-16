@@ -155,9 +155,10 @@ def activities():
     else:
         return "Unsupported request header: " + request.method
 
-@app.route("/reports", methods=['GET'])
-def report():
-    return "Not Yet Implemented"
+@app.route("/admin", methods=['GET'])
+def admin():
+    return render_template('admin.html')
+
 
 
 ##################

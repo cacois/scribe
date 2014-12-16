@@ -9,7 +9,7 @@ var lastVal = "";
 $( document ).ready(function() {
 
   /** Initialization **/
-  console.log('APP URL: ' + $SCRIPT_ROOT + '/api/config');
+  
   // get config, store
   $.getJSON($SCRIPT_ROOT + '/api/config', null, function(data) {
     setConfig(data);
